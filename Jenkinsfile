@@ -1,27 +1,34 @@
 pipeline {
-    agent {
-        docker {
-            image = 'node:18-slim'
-        }
-    }
+    agent any
 
     environment {
-        DOCKER_IMAGE_NAME = "franklynux/nodejs-app"
-        DOCKER_IMAGE_TAG = "v1.0"
+        DOCKER_IMAGE_NAME     = "franklynux/nodejs-app"
+        DOCKER_IMAGE_TAG      = "v1.0"
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
 
     stages {
+        stage('Install Node.js') {
+            steps {
+                sh '''
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+                    apt-get install -y nodejs
+                '''
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'npm install'
             }
         }
+
         stage('Test') {
             steps {
                 sh 'npm test'
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -29,6 +36,7 @@ pipeline {
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 script {
@@ -39,6 +47,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy') {
             steps {
                 sh '''
@@ -49,7 +58,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             sh 'docker logout'
