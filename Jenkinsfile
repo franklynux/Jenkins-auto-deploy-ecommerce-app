@@ -30,10 +30,15 @@ pipeline {
            agent {
                docker {
                    image 'node:18-slim'
+                   args '-u root:root'  // Run as root to avoid permission issues
                }
            }
            steps {
-               sh 'npm install'
+               sh '''
+                   mkdir -p /.npm
+                   chown -R $(id -u):$(id -g) /.npm
+                   npm install
+               '''
            }
        }
 
@@ -41,10 +46,15 @@ pipeline {
            agent {
                docker {
                    image 'node:18-slim'
+                   args '-u root:root'  // Run as root to avoid permission issues
                }
            }
            steps {
-               sh 'npm test'
+               sh '''
+                   mkdir -p /.npm
+                   chown -R $(id -u):$(id -g) /.npm
+                   npm test
+               '''
            }
        }
 
