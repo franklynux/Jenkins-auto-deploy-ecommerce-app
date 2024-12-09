@@ -11,8 +11,8 @@ pipeline {
         stage('Install Node.js') {
             steps {
                 sh '''
-                    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-                    apt-get install -y nodejs
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo bash -
+                    sudo apt-get install -y nodejs
                 '''
             }
         }
@@ -41,7 +41,6 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-                        def dockerImage = docker.build("${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
                         dockerImage.push()
                     }
                 }
@@ -51,9 +50,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    docker stop tech-consulting-app || true
-                    docker rm tech-consulting-app || true
-                    docker run -d -p 3000:3000 --name tech-consulting-app ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                    sudo docker stop tech-consulting-app || true
+                    sudo docker rm tech-consulting-app || true
+                    sudo docker run -d -p 3000:3000 --name tech-consulting-app ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                 '''
             }
         }
