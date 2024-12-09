@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18-slim'
+        }
+    }
 
     environment {
         DOCKER_IMAGE_NAME     = "franklynux/nodejs-app"
@@ -8,15 +12,6 @@ pipeline {
     }
 
     stages {
-        stage('Install Node.js') {
-            steps {
-                sh '''
-                    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo bash -
-                    sudo apt-get install -y nodejs
-                '''
-            }
-        }
-
         stage('Build') {
             steps {
                 sh 'npm install'
@@ -30,6 +25,7 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+            agent any
             steps {
                 script {
                     dockerImage = docker.build("${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
@@ -38,6 +34,7 @@ pipeline {
         }
 
         stage('Push Docker Image') {
+            agent any
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
@@ -48,11 +45,12 @@ pipeline {
         }
 
         stage('Deploy') {
+            agent any
             steps {
                 sh '''
-                    sudo docker stop tech-consulting-app || true
-                    sudo docker rm tech-consulting-app || true
-                    sudo docker run -d -p 3000:3000 --name tech-consulting-app ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                    docker stop tech-consulting-app || true
+                    docker rm tech-consulting-app || true
+                    docker run -d -p 3000:3000 --name tech-consulting-app ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                 '''
             }
         }
