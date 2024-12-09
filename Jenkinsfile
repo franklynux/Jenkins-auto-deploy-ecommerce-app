@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image = 'node:18-slim'
+        }
+    }
 
     environment {
         DOCKER_IMAGE_NAME = "franklynux/nodejs-app"
@@ -21,7 +25,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.build("${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
+                    dockerImage = docker.build("${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}")
                 }
             }
         }
@@ -37,8 +41,18 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 3000:3000 --name tech-consulting-app ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}'
+                sh '''
+                    docker stop tech-consulting-app || true
+                    docker rm tech-consulting-app || true
+                    docker run -d -p 3000:3000 --name tech-consulting-app ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                '''
             }
+        }
+    }
+    
+    post {
+        always {
+            sh 'docker logout'
         }
     }
 }
