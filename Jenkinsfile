@@ -1,5 +1,10 @@
 pipeline {
-   agent any
+   agent {
+       docker {
+           image 'node:18-slim'
+           args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
+       }
+   }
    
    environment {
        DOCKER_IMAGE_NAME     = "franklynux/nodejs-app"
@@ -27,12 +32,6 @@ pipeline {
        }
 
        stage('Build and Test') {
-           agent {
-               docker {
-                   image 'node:18-slim'
-                   args '-u root:root'  // Run as root to avoid permission issues
-               }
-           }
            steps {
                script {
                    // Clean install
