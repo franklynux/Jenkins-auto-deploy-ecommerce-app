@@ -8,15 +8,21 @@ pipeline {
    }
 
    stages {
-       stage('Install Docker') {
+       stage('Check Docker') {
            steps {
-               sh '''
-                   sudo apt update
-                   sudo apt install -y docker.io
-                   sudo usermod -aG docker jenkins
-                   sudo systemctl start docker
-                   sudo systemctl enable docker
-               '''
+               script {
+                   // Check if Docker is installed and running
+                   sh '''
+                       docker --version || {
+                           echo "Docker is not installed or not in PATH"
+                           exit 1
+                       }
+                       docker info || {
+                           echo "Docker daemon is not running"
+                           exit 1
+                       }
+                   '''
+               }
            }
        }
 
