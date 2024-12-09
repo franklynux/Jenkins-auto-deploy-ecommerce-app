@@ -26,7 +26,7 @@ pipeline {
            }
        }
 
-       stage('Build') {
+       stage('Build and Test') {
            agent {
                docker {
                    image 'node:18-slim'
@@ -34,27 +34,23 @@ pipeline {
                }
            }
            steps {
-               sh '''
-                   mkdir -p /.npm
-                   chown -R $(id -u):$(id -g) /.npm
-                   npm install
-               '''
-           }
-       }
-
-       stage('Test') {
-           agent {
-               docker {
-                   image 'node:18-slim'
-                   args '-u root:root'  // Run as root to avoid permission issues
+               script {
+                   // Clean install
+                   sh '''
+                       echo "Cleaning npm cache and node_modules..."
+                       rm -rf node_modules package-lock.json
+                       mkdir -p /.npm
+                       chown -R $(id -u):$(id -g) /.npm
+                       
+                       echo "Installing dependencies..."
+                       npm cache clean --force
+                       # Install both production and dev dependencies
+                       NODE_ENV=development npm install
+                       
+                       echo "Running tests..."
+                       NODE_ENV=development npm test
+                   '''
                }
-           }
-           steps {
-               sh '''
-                   mkdir -p /.npm
-                   chown -R $(id -u):$(id -g) /.npm
-                   npm test
-               '''
            }
        }
 
