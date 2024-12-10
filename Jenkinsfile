@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_IMAGE_NAME     = "franklynux/nodejs-app"
         DOCKER_IMAGE_TAG      = "v1.0"
-        // This line creates DOCKERHUB_CREDENTIALS_USR and DOCKERHUB_CREDENTIALS_PSW variables
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
 
@@ -19,7 +18,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:18-slim'
-                    args '-u root:root'  // Run as root to avoid permission issues
+                    args '-u root:root'
                     reuseNode true
                 }
             }
@@ -45,16 +44,14 @@ pipeline {
         stage('Build and Push Docker Image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-                        // Login to DockerHub
-                        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                        
-                        // Build Docker image
-                        sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-                        
-                        // Push Docker image
-                        sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-                    }
+                    // Build Docker image
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                    
+                    // Login to DockerHub and push
+                    sh '''
+                        echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin
+                        docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                    '''
                 }
             }
         }
