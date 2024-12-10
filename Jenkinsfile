@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        DOCKER_REGISTRY = 'docker.io'
         DOCKER_IMAGE_NAME = 'franklynux/nodejs-app'
         DOCKER_IMAGE_TAG = 'v1.0'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
@@ -25,11 +26,15 @@ pipeline {
             steps {
                 script {
                     // Build Docker image
-                    sh """
-                        # Ensure buildx is initialized
-                        docker buildx create --use || true
-                        docker buildx build --platform linux/amd64 -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} --push .
-                    """
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                    
+                    // Login and push using credentials in a secure way
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh '''
+                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                            docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                        '''
+                    }
                 }
             }
         }
@@ -39,16 +44,16 @@ pipeline {
                 script {
                     sh '''
                         # Stop and remove existing container if it exists
-                        if docker inspect tech-consulting-app &>/dev/null; then
+                        if docker ps -a | grep -q tech-consulting-app; then
                             docker stop tech-consulting-app
                             docker rm tech-consulting-app
                         fi
                         
                         # Run new container
-                        docker run -d \
-                            --name tech-consulting-app \
-                            --restart unless-stopped \
-                            -p 3000:3000 \
+                        docker run -d \\
+                            --name tech-consulting-app \\
+                            --restart unless-stopped \\
+                            -p 3000:3000 \\
                             ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     '''
                 }
