@@ -19,11 +19,16 @@ pipeline {
             agent {
                 docker {
                     image 'node:18-slim'
+                    args '-u root:root'  // Run as root to avoid permission issues
                     reuseNode true
                 }
             }
             steps {
                 sh '''
+                    echo "Setting up npm permissions..."
+                    mkdir -p /.npm
+                    chown -R $(id -u):$(id -g) /.npm
+                    
                     echo "Cleaning npm cache and node_modules..."
                     rm -rf node_modules package-lock.json
                     
@@ -40,7 +45,6 @@ pipeline {
         stage('Build and Push Docker Image') {
             steps {
                 script {
-                    // Using the automatically created credential variables
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
                         // Login to DockerHub
                         sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
