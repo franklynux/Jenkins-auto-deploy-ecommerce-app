@@ -1,14 +1,28 @@
 #!/bin/bash
 
-# Install Node.js if not already installed
-if ! command -v node &> /dev/null
-then
-    echo "Node.js not found. Installing..."
-    curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-fi
+# Function to install Node.js using nvm
+setup_nodejs() {
+    # Install nvm if not present
+    export NVM_DIR="$HOME/.nvm"
+    if [ ! -d "$NVM_DIR" ]; then
+        echo "Installing nvm..."
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
+    fi
 
-# Verify Node.js and npm installation
+    # Load nvm if already installed
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    # Install and use Node.js 18
+    echo "Installing Node.js 18..."
+    nvm install 18
+    nvm use 18
+}
+
+# Setup Node.js
+setup_nodejs
+
+# Verify installation
 echo "Node.js version:"
 node -v
 echo "npm version:"
