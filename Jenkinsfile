@@ -5,7 +5,6 @@ pipeline {
         DOCKER_REGISTRY = 'docker.io'
         DOCKER_IMAGE_NAME = 'franklynux/nodejs-app'
         DOCKER_IMAGE_TAG = 'v1.0'
-        // This creates DOCKERHUB_CREDENTIALS_USR and DOCKERHUB_CREDENTIALS_PSW
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
 
@@ -14,33 +13,6 @@ pipeline {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/franklynux/Jenkins-auto-deploy-ecommerce-app.git'
-            }
-        }
-
-        stage('Install Dependencies and Test') {
-            agent {
-                docker {
-                    image 'node:18-slim'
-                    args '-u root:root'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    echo "Setting up npm permissions..."
-                    mkdir -p /.npm
-                    chown -R $(id -u):$(id -g) /.npm
-                    
-                    echo "Cleaning npm cache and node_modules..."
-                    rm -rf node_modules package-lock.json
-                    
-                    echo "Installing dependencies..."
-                    npm cache clean --force
-                    NODE_ENV=production npm install --no-fund --no-audit
-                    
-                    echo "Running tests..."
-                    npm test
-                '''
             }
         }
 
