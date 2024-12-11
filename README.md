@@ -3,7 +3,7 @@
 This project demonstrates a comprehensive CI/CD pipeline implementation using Jenkins for an E-commerce application. The pipeline includes automated building, testing, containerization, and deployment processes.
 
 ![Project Architecture](./images/Jenkins%20CI_CD%20pipeline.png)
-***[ Flow chart diagram showing the complete CI/CD flow: GitHub -> Jenkins (Build/Test) -> Docker Hub -> Deployment ]***
+***[Flow chart diagram showing the complete CI/CD flow: GitHub -> Jenkins (Build/Test) -> Docker Hub -> Deployment]***
 
 ## Table of Contents
 
@@ -12,6 +12,7 @@ This project demonstrates a comprehensive CI/CD pipeline implementation using Je
 - [Infrastructure Setup](#infrastructure-setup)
 - [Jenkins Configuration](#jenkins-configuration)
 - [Pipeline Implementation](#pipeline-implementation)
+- [Local Development](#local-development)
 - [Security Considerations](#security-considerations)
 - [Monitoring and Maintenance](#monitoring-and-maintenance)
 - [Troubleshooting](#troubleshooting)
@@ -73,7 +74,7 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
    ssh -i "your-key.pem" ubuntu@your-ec2-public-dns
    ```
 
-   **Note:** Replace "your-key.pem" with your EC2 key pair file and "your-ec2-public-dns" with your Jenkins instance public IP/dns
+   **Note:** Replace "your-key.pem" with your EC2 key pair file and "your-ec2-public-dns" with your Jenkins instance public IP/dns.
    ![EC2 connect](./images/ssh%20into%20jenkins%20server.png)
 
 ### Installing Required Software
@@ -92,8 +93,8 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
 
    ```bash
    # This is the Debian package repository of Jenkins to automate installation and upgrade. To use this repository, first add the key to your system:
-    sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
-      https://pkg.jenkins.io/debian/jenkins.io-2023.key 
+   sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+     https://pkg.jenkins.io/debian/jenkins.io-2023.key 
 
    # Then add a Jenkins apt repository entry:  
    echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
@@ -153,7 +154,7 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
    **Jenkins unlock page:**
    ![Jenkins Initial Setup](./images/1.%20jenkins%20login.png)
 
-   **Install suggested plugins (Git, Credentials, Timestamper plugins, e.t.c) are installed by default:**
+   **Install suggested plugins (Git, Credentials, Timestamper plugins, etc.) are installed by default:**
    ![Jenkins Initial Setup](./images/2.%20install%20default%20plugins.png)
 
    **Create First Admin User:**
@@ -164,7 +165,7 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
 
 2. Install Docker & Pipeline Plugins
    - Docker Pipeline
-  
+     
      ![Docker pipeline plugin installed](./images/Docker%20plugin%20install.png)
 
    - Pipeline
@@ -179,9 +180,8 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
    - Go to Dashboard → Manage Jenkins → Security
    - Under Security Realm, select "Jenkins' own user database"
    - Check "Allow users to sign up" (you can uncheck this later)
-   - Click Save
 
-   ![Jenkins Security Realm](./images/jenkins-security-realm.png)
+   ![Jenkins Security](./images/Jenkins%20User%20Authenticaion.png)
    ***[Screenshot showing Jenkins security realm configuration]***
 
 2. **Configure Authorization**:
@@ -194,7 +194,7 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
      - View: Read
    - Click Save
 
-   ![Jenkins Authorization](./images/jenkins-authorization.png)
+   ![Jenkins Authorization](./images/Jenkins%20User%20Authorization.png)
    ***[Screenshot showing Jenkins authorization matrix configuration]***
 
 3. **Manage Users**:
@@ -202,9 +202,6 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
    - Add/remove users as needed
    - Set strong passwords
    - Disable sign-up option after adding necessary users
-
-   ![Jenkins User Management](./images/jenkins-user-management.png)
-   ***[Screenshot showing Jenkins user management page]***
 
 ### Configure Credentials
 
@@ -233,6 +230,10 @@ To enable automatic triggering of the Jenkins pipeline when code changes are pus
 1. **Setup GitHub Webhook**:
    - Go to your GitHub repository
    - Click Settings → Webhooks → Add webhook
+
+    ![webhook navigation](./images/11.%20github%20webhook%20set.png)
+    ![webhook navigation](./images/12.%20github%20webhook%20set%202.png)
+
    - Configure webhook:
      - Payload URL: `http://your-jenkins-url/github-webhook/`
      - Content type: `application/json`
@@ -241,7 +242,7 @@ To enable automatic triggering of the Jenkins pipeline when code changes are pus
      - Events: Select "Just the push event"
      - Active: Check to enable the webhook
 
-   ![GitHub Webhook Setup](./images/github-webhook-setup.png)
+   ![GitHub Webhook Setup](./images/14.%20github%20webhook%20set%204%20(add).png)
    ***[Screenshot showing GitHub webhook configuration page]***
 
 2. **Verify Webhook**:
@@ -249,7 +250,7 @@ To enable automatic triggering of the Jenkins pipeline when code changes are pus
    - Check the webhook's Recent Deliveries
    - Verify the ping event was successful (green checkmark)
 
-   ![GitHub Webhook Delivery](./images/github-webhook-delivery.png)
+   ![GitHub Webhook Delivery](./images/15.%20github%20webhook%20complete.png)
    ***[Screenshot showing successful webhook delivery]***
 
 ### Freestyle Job Setup (Build & Test)
@@ -369,7 +370,7 @@ FROM node:18-slim
 WORKDIR /usr/src/app
 
 # Copy package files first to leverage Docker cache
-COPY package*.json ./
+COPY package*.json ./ 
 
 # Install dependencies
 RUN npm install
@@ -545,6 +546,51 @@ npm test
 ![Application](./images/Access%20web%20app%202.png)
 ***[Web application running successfully]***
 
+## Local Development
+
+### Prerequisites
+
+- Ensure you have Node.js (version 18 or higher) and npm installed on your machine.
+
+### Building the Application
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/franklynux/Jenkins-auto-deploy-ecommerce-app.git
+   cd Jenkins-auto-deploy-ecommerce-app
+   ```
+
+2. **Install Dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+### Running the Application
+
+To start the application locally, run:
+
+```bash
+npm start
+```
+
+The application will be available at `http://localhost:3000`.
+
+### Running Tests
+
+To execute the tests, run:
+
+```bash
+npm test
+```
+
+This will run the test suite and display the results in the terminal.
+
+### Stopping the Application
+
+To stop the application, you can use `Ctrl + C` in the terminal where the application is running.
+
 ## API Endpoints
 
 ### Home Page
@@ -552,7 +598,6 @@ npm test
 - **URL:** `/`
 
 ![Home Page Screenshot](./images/API%20endpoints%20-%20Home.png)
-[Place screenshot of home page here]
 
 - **Method:** `GET`
 - **Description:** Landing page with navigation links

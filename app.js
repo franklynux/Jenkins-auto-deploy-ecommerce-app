@@ -24,6 +24,11 @@ const services = [
         id: 3,
         name: 'Custom Software Development',
         description: 'Tailored software solutions for business needs'
+    },
+    {
+        id: 4,
+        name: 'AI & Machine Learning',
+        description: 'Innovative AI solutions to enhance business processes'
     }
 ];
 
