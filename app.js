@@ -35,7 +35,7 @@ const services = [
 // Routes
 app.get('/', (req, res) => {
     res.send(`
-        <h1>Welcome to TechConsult</h1>
+        <h1>Welcome to TechConsult!</h1>
         <p>Your trusted technology partner for digital transformation</p>
         <a href="/services">View Our Services</a>
         <br>
