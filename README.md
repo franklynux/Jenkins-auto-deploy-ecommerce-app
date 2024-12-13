@@ -16,6 +16,8 @@ This project demonstrates a comprehensive CI/CD pipeline implementation using Je
 - [Security Considerations](#security-considerations)
 - [Monitoring and Maintenance](#monitoring-and-maintenance)
 - [Troubleshooting](#troubleshooting)
+- [Project Structure](#project-structure)
+- [Live Demo Documentation](#live-demo-documentation)
 
 ## Project Overview
 
@@ -355,6 +357,7 @@ Common Issues and Solutions:
 ├── Jenkinsfile          # Pipeline definition
 ├── jenkins-freestyle-build.sh  # Build script
 ├── package.json         # Node.js dependencies
+├── live_demo_documentation.md  # Live demo documentation
 └── README.md           # Project documentation
 ```
 
