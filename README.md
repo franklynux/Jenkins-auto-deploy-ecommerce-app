@@ -68,7 +68,7 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
    ```
 
    ![Security Group Configuration](./images/Security%20group%20fro%20jenkins%20server.png)
-   [Image placeholder: Add screenshot of EC2 security group settings]
+   **[Screenshot showing EC2 security group configuration]**
 
 2. Connect to EC2 instance
 
@@ -115,7 +115,6 @@ This project implements a complete CI/CD pipeline for an E-commerce application 
 
    **Jenkins active (running):**
    ![Jenkins Installation](./images/Jenkins%20install%207%20(active%20running).png)
-   [Image placeholder: Add screenshot of successful Jenkins installation]
 
 3. Install Docker
 
